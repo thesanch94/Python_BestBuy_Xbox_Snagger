@@ -2,8 +2,8 @@ import os
 from datetime import datetime
 from tkinter import *
 from pytz import timezone
-import xbox_snagger
-
+import chrome_bot
+import sys
 
 class Window(Frame):
     def __init__(self, master=None):
@@ -15,7 +15,7 @@ class Window(Frame):
         self.bot = None
 
     def client_exit(self):
-        exit()
+        sys.exit()
 
 
     def callprint(self, message, tzone='US/Central'):
@@ -35,45 +35,39 @@ class Window(Frame):
         file = Menu(menu)
         file.add_command(label="Exit", command=self.client_exit)
         menu.add_cascade(label="File", menu=file)
-        self.text_email = Label(self, text="Best Buy Email")
-        self.text_email.place(x=150, y=45)
-        self.entry_email = Entry(self.master)
-        self.entry_email.place(x=275, y=45)
-
-        self.text_password = Label(self, text="Best Buy Password")
-        self.text_password.place(x=150, y=80)
-        self.entry_pw = Entry(self.master, show="*")
-        self.entry_pw.place(x=275, y=80)
 
         button = Button(self, text="Initialize Chromedriver", command=self.initialize)
         button.place(x=5, y=5)
 
-        button = Button(self, text="Login to Bestbuy", command=self.login)
-        button.place(x=5, y=40)
+        self.text_email = Label(self, text="Be sure to manually login after initializing the chrome driver!")
+        self.text_email.place(x=145, y=5)
 
         button = Button(self, text="Begin the Snagging", command=self.loop_until_snag)
-        button.place(x=5, y=75)
+        button.place(x=5, y=40)
+
+        self.text_email = Label(self, text="Product URL, Defaulted to Xbox Series X, must be a BEST BUY online product")
+        self.text_email.place(x=5, y=75)
+        self.entry_productURL = Entry(self.master, width=75)
+        self.entry_productURL.insert(END, "https://www.bestbuy.com/site/microsoft-xbox-series-x-1tb-console-black/6428324.p?skuId=6428324")
+        self.entry_productURL.place(x=5, y=110)
 
     def initialize(self):
-        un = str(self.entry_email.get())
-        pw = str(self.entry_pw.get())
-        if un == "" or pw == "":
-            self.callprint("Please specify a valid email and password")
-            return
-        self.bot = xbox_snagger.xbox_snagger(un, pw, os.getcwd())
+
+        self.bot = chrome_bot.chrome_bot(os.getcwd())
         self.bot.initiate_driver()
 
     def login(self):
         self.bot.login_bestbuy()
 
     def loop_until_snag(self):
-        self.bot.loop_wait_and_add_to_cart()
+        url = str(self.entry_productURL.get())
+        self.bot.loop_wait_and_add_to_cart(url)
 
 
 
 
 
 root = Tk()
-root.geometry("600x500")
+root.geometry("600x200")
 app = Window(root)
 root.mainloop()
