@@ -56,9 +56,6 @@ class Window(Frame):
         self.bot = chrome_bot.chrome_bot(os.getcwd())
         self.bot.initiate_driver()
 
-    def login(self):
-        self.bot.login_bestbuy()
-
     def loop_until_snag(self):
         url = str(self.entry_productURL.get())
         self.bot.loop_wait_and_add_to_cart(url)
